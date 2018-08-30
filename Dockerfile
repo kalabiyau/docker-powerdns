@@ -1,8 +1,6 @@
-FROM alpine
-MAINTAINER Christoph Wiechert <wio@psitrax.de>
+FROM opensuse/leap:15.0
 
-ENV REFRESHED_AT="2018-05-21" \
-    POWERDNS_VERSION=4.1.2 \
+ENV REFRESHED_AT="2018-08-30" \
     MYSQL_AUTOCONF=true \
     MYSQL_HOST="mysql" \
     MYSQL_PORT="3306" \
@@ -11,19 +9,8 @@ ENV REFRESHED_AT="2018-05-21" \
     MYSQL_DB="pdns" \
     CAME_FROM="https://github.com/kalabiyau/docker-powerdns"
 
-RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc++ libgcc && \
-    apk add --virtual build-deps \
-      g++ make mariadb-dev postgresql-dev sqlite-dev curl boost-dev && \
-    curl -sSL https://downloads.powerdns.com/releases/pdns-$POWERDNS_VERSION.tar.bz2 | tar xj -C /tmp && \
-    cd /tmp/pdns-$POWERDNS_VERSION && \
-    ./configure --prefix="" --exec-prefix=/usr --sysconfdir=/etc/pdns \
-      --with-modules="bind gmysql gpgsql gsqlite3" --without-lua && \
-    make && make install-strip && cd / && \
-    mkdir -p /etc/pdns/conf.d && \
-    addgroup -S pdns 2>/dev/null && \
-    adduser -S -D -H -h /var/empty -s /bin/false -G pdns -g pdns pdns 2>/dev/null && \
-    apk del --purge build-deps && \
-    rm -rf /tmp/pdns-$POWERDNS_VERSION /var/cache/apk/*
+RUN zypper --non-interactive in pdns pdns-backend-mysql pdns-backend-remote mariadb-client
+RUN mkdir -p /etc/pdns/conf.d
 
 ADD schema.sql pdns.conf /etc/pdns/
 ADD entrypoint.sh /
