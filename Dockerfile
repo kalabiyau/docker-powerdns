@@ -8,7 +8,8 @@ ENV REFRESHED_AT="2018-05-21" \
     MYSQL_PORT="3306" \
     MYSQL_USER="root" \
     MYSQL_PASS="root" \
-    MYSQL_DB="pdns"
+    MYSQL_DB="pdns" \
+    CAME_FROM="https://github.com/kalabiyau/docker-powerdns"
 
 RUN apk --update add mysql-client mariadb-client-libs libpq sqlite-libs libstdc++ libgcc && \
     apk add --virtual build-deps \
